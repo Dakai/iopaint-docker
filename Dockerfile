@@ -27,9 +27,16 @@ RUN pip3 install --upgrade pip && \
     pip3 install torch==2.1.0 torchvision==0.16.0 --extra-index-url https://download.pytorch.org/whl/cpu && \ 
     pip3 install -r requirements.txt
 
+COPY . .
+
+RUN apt-get install -y bun git && \
+    bun run build
+
 # Copy the rest of your application's code into the container at /app
 #COPY . .
 
-EXPOSE 8080
+EXPOSE 3000
+
+ENTRYPOINT ["bun", "./build/index.js"]
 
 #CMD ["iopaint", "start","--model=lama", "--device=cpu", "--host=0.0.0.0", "--enable-realesrgan", "--realesrgan-model", "RealESRGAN_x4plus", "--realesrgan-device", "cpu", "--enable-gfpgan", "--gfpgan-device", "cpu","--enable-remove-bg", "--enable-interactive-seg", "--interactive-seg-model=vit_l", "--interactive-seg-device=cpu"]
