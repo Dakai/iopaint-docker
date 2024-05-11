@@ -32,4 +32,4 @@ RUN pip3 install --upgrade pip && \
 
 EXPOSE 8080
 
-CMD ["iopaint", "start","--model=lama", "--device=cpu", "--host=0.0.0.0", "--enable-realesrgan", "--realesrgan-model", "RealESRGAN_x4plus", "--realesrgan-device", "cpu", "--enable-gfpgan", "--gfpgan-device", "cpu","--enable-remove-bg", "--enable-interactive-seg", "--interactive-seg-model=vit_l", "--interactive-seg-device=cpu", "--model Sanster/AnyText" ,"--model runwayml/stable-diffusion-inpainting", "--model Fantasy-Studio/Paint-by-Example"]
+CMD ["iopaint", "start","--model=lama", "--device=cpu", "--host=0.0.0.0", "--enable-realesrgan", "--realesrgan-model", "RealESRGAN_x4plus", "--realesrgan-device", "cpu", "--enable-gfpgan", "--gfpgan-device", "cpu","--enable-remove-bg", "--enable-interactive-seg", "--interactive-seg-model=vit_l", "--interactive-seg-device=cpu"]
