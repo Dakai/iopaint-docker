@@ -28,9 +28,9 @@ RUN pip3 install --upgrade pip && \
     pip3 install -r requirements.txt
 
 COPY . .
-
-RUN apt-get install -y bun git && \
-    bun run build
+RUN curl -fsSL https://bun.sh/install | bash
+RUN apt-get install -y git
+RUN bun run build
 
 # Copy the rest of your application's code into the container at /app
 #COPY . .
