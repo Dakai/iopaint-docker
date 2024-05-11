@@ -6,7 +6,8 @@
 
 	export let data: any;
 	const { models } = data;
-	console.log(models);
+
+	$: console.log($output);
 
 	let selected: string;
 
@@ -27,7 +28,7 @@
 			use:enhance
 			method="POST"
 			action="?/run"
-			class="container mx-auto text-center flex flex-col gap-y-6"
+			class="container mx-auto text-center flex flex-col gap-y-6 mb-6"
 		>
 			<h1 class="text-white font-bold text-lg">IO Paint Wrapper</h1>
 			<Select class="w-1/4 mx-auto" items={models} bind:value={selected} defaultValue="lama" />
@@ -50,11 +51,11 @@
 				class="w-1/4 mx-auto"
 				color="pinkToOrange"
 				type="submit"
-				disabled={$process_id === 0}>End Process</GradientButton
+				disabled={$process_id === 0}>End Process {$process_id}</GradientButton
 			>
 		</form>
 		<div
-			class="text-gray599 text-sm rounded-xl border-2 border-white w-1/2 mx-auto whitespace-pre-wrap"
+			class="text-gray599 text-sm rounded-xl border-2 border-gray-600 w-1/2 mx-auto whitespace-pre-wrap"
 		>
 			{$output}
 		</div>

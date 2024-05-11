@@ -28,6 +28,7 @@ export const actions = {
       output.set(stdout)
       console.log(`stdout: ${stdout}`);
     })
+    console.log('pid', child.pid)
     child.pid ? process_id.set(child.pid) : null;
   },
   stop: async () => {
