@@ -13,6 +13,7 @@ services:
       context: .
     volumes:
       - ./.cache:/app/.cache
+      - ./venv:/app/opt/venv
     ports:
       - "3000:3000"
         #extra_hosts:
