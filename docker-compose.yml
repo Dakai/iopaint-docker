@@ -1,20 +1,15 @@
 services:
-  #  authfreeaskinternet:
-  #    image: authfreeaskinternet
-  #    build: .
-  #    ports:
-  #      - "3001:3001"
-  #    extra_hosts:
-  #      - "host.docker.internal:host-gateway"
   iopaint:
-    container_name: iopaint
+    container_name: iopaint-wrapper
+    volumes:
+      - ./.cache:/root/.cache
+      - ./venv:/opt/venv
     build: 
       dockerfile: Dockerfile
       context: .
-    volumes:
-      - ./.cache:/app/.cache
-      - ./venv:/app/opt/venv
     ports:
       - "3000:3000"
         #extra_hosts:
         #  - "host.docker.internal:host-gateway"
+volumes:
+    venv:
