@@ -1,7 +1,5 @@
 import type { RequestEvent } from "@sveltejs/kit";
-import { output, process_id } from '$lib/stores';
 import { exec } from 'child_process'
-import { get } from 'svelte/store'
 
 let cmd = "iopaint start --model "
 let args = " --device=cpu --host=0.0.0.0 --enable-realesrgan \
@@ -16,35 +14,29 @@ export const actions = {
     const run = cmd + model + args;
     let child = exec(run, (error, stdout, stderr) => {
       if (error) {
-        output.set(error.message)
         console.log(`error: ${error.message}`);
         return;
       }
       if (stderr) {
-        output.set(stderr)
         console.log(`stderr: ${stderr}`);
         return;
       }
-      output.set(stdout)
       console.log(`stdout: ${stdout}`);
     })
     console.log('pid', child.pid)
-    child.pid ? process_id.set(child.pid) : null;
+    //console.log('pid', get(process_id))
   },
   stop: async () => {
-    let pid = get(process_id);
+    let pid = 0;
     exec('kill ' + pid, (error, stdout, stderr) => {
       if (error) {
-        output.set(error.message)
         console.log(`error: ${error.message}`);
         return;
       }
       if (stderr) {
-        output.set(stderr)
         console.log(`stderr: ${stderr}`);
         return;
       }
-      output.set(stdout)
       console.log(`stdout: ${stdout}`);
     })
   }

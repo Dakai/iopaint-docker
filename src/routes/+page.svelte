@@ -7,8 +7,6 @@
 	export let data: any;
 	const { models } = data;
 
-	$: console.log($output);
-
 	let selected: string;
 
 	const displayName = writable('');
