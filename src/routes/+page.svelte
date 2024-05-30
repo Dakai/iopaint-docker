@@ -14,6 +14,32 @@
 	$: $displayName = selected
 		? models.find((m: any) => m.value === selected)?.name
 		: 'Selected Model';
+
+	const handleSubmit = async (event: SubmitEvent) => {
+		event.preventDefault();
+		const formData = new FormData(event.target as HTMLFormElement);
+
+		try {
+			const response = await fetch('/?/run', {
+				method: 'POST',
+				body: formData
+			});
+
+			const data = await response.json();
+			if (response.ok) {
+				$output = data.output;
+				$process_id = data.id;
+			} else {
+				$output = data.error;
+			}
+
+			//const { id } = await response.json();
+			//$process_id = id;
+		} catch (error) {
+			//$output = error;
+			console.error(error);
+		}
+	};
 </script>
 
 <svelte:head>
@@ -22,12 +48,7 @@
 
 <div class="h-screen bg-black flex items-center">
 	<div class="flex flex-col justify-items-center gap-y-6 w-full">
-		<form
-			use:enhance
-			method="POST"
-			action="?/run"
-			class="container mx-auto text-center flex flex-col gap-y-6 mb-6"
-		>
+		<form on:submit={handleSubmit} class="container mx-auto text-center flex flex-col gap-y-6 mb-6">
 			<h1 class="text-white font-bold text-lg">IO Paint Wrapper</h1>
 			<Select class="w-1/4 mx-auto" items={models} bind:value={selected} defaultValue="lama" />
 			<GradientButton

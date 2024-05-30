@@ -12,19 +12,25 @@ export const actions = {
     const data = await req.request.formData();
     const model = data.get('model')
     const run = cmd + model + args;
-    let child = exec(run, (error, stdout, stderr) => {
-      if (error) {
-        console.log(`error: ${error.message}`);
-        return;
-      }
-      if (stderr) {
-        console.log(`stderr: ${stderr}`);
-        return;
-      }
-      console.log(`stdout: ${stdout}`);
+
+    return new Promise((resolve, reject) => {
+      const process = exec(run, (error, stdout, stderr) => {
+        if (error) {
+          console.log(`error: ${error.message}`);
+          reject({ error: error.message })
+          return;
+        }
+        if (stderr) {
+          console.log(`stderr: ${stderr}`);
+          reject({ error: stderr })
+          return;
+        }
+        console.log(`stdout: ${stdout}`);
+        resolve({ output: stdout })
+      })
+      console.log('process', process.pid)
     })
-    console.log('pid', child.pid)
-    //console.log('pid', get(process_id))
+
   },
   stop: async () => {
     let pid = 0;
