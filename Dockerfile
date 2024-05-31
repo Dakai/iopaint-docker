@@ -1,14 +1,15 @@
 # Use the official Python image, which always includes the latest Python version
 #FROM python:alpine
 #FROM python:3.10.11-slim-buster
-FROM oven/bun:canary-debian
+FROM oven/bun:debian
 # Set the working directory inside the container
 WORKDIR /app
 
 # Set an environment variable to store where the virtual environment will be created
 ENV VIRTUAL_ENV=/opt/venv
 
-RUN apt-get update && apt-get install python3 ffmpeg libsm6 libxext6 curl git unzip python3-venv -y
+#RUN apt-get update && apt-get install python3 ffmpeg libsm6 libxext6 curl git unzip python3-venv -y
+RUN apt-get update && apt-get install python3 python3-venv -y
 
 # Create the virtual environment
 RUN python3 -m venv $VIRTUAL_ENV
@@ -22,12 +23,14 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 # This assumes you have a requirements.txt file in your project
 # for managing dependencies. If you don't, you'll need to adjust
 # accordingly and possibly use `pip install` commands directly.
-COPY requirements.txt .
 
-# Install dependencies in the virtual environment
-RUN pip3 install --upgrade pip && \
-    pip3 install torch==2.1.0 torchvision==0.16.0 --extra-index-url https://download.pytorch.org/whl/cpu && \ 
-    pip3 install -r requirements.txt
+#COPY requirements.txt .
+#
+## Install dependencies in the virtual environment
+#RUN pip3 install --upgrade pip && \
+#    pip3 install torch==2.1.0 torchvision==0.16.0 --extra-index-url https://download.pytorch.org/whl/cpu && \ 
+#    pip3 install -r requirements.txt
+#
 
 #RUN pip3 install --upgrade pip && \
 #    apt-get update && apt-get install ffmpeg libsm6 libxext6 curl git unzip -y && \
