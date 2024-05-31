@@ -1,9 +1,11 @@
 services:
-  iopaint:
+  iopaint-wrapper:
     container_name: iopaint-wrapper
     volumes:
-      - ./.cache:/root/.cache
-      - ./venv:/opt/venv
+      - ./.cache:/app/.cache
+      - ./venv:/app/venv
+    environment:
+      - VIRTUAL_ENV=/app/venv
     build: 
       dockerfile: Dockerfile
       context: .
