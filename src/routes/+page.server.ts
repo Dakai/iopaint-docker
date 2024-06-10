@@ -58,7 +58,7 @@ export const actions = {
   test: async (req: RequestEvent) => {
     const data = await req.request.formData();
     const model = data.get('model')
-    console.log(data)
+    //console.log(data)
     let run = 'ls'
     //if (model) {
     //  run = cmd + model + args;
@@ -91,5 +91,6 @@ export const actions = {
       console.log(`stdout: ${stdout}`);
     })
     console.log('process', process.pid)
+    //return wss.close()
   }
 }

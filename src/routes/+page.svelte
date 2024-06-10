@@ -3,12 +3,13 @@
 	import { writable } from 'svelte/store';
 	import { enhance } from '$app/forms';
 	import { output, process_id } from '$lib/stores';
-	import { onMount } from 'svelte';
+	import { onMount, afterUpdate } from 'svelte';
 
 	export let data: any;
 	const { models } = data;
 	let ws: WebSocket;
 	let responseData: Array<{ output?: string; error?: string; message?: string }> = [];
+	let outputFrame: HTMLDivElement;
 
 	onMount(() => {
 		ws = new WebSocket('ws://localhost:9880');
@@ -30,6 +31,12 @@
 		};
 	});
 	//	let ws = new WebSocket('ws://localhost:9880');
+	afterUpdate(() => {
+		// Scroll to the bottom of the output frame when new data is added
+		if (outputFrame) {
+			outputFrame.scrollTop = outputFrame.scrollHeight;
+		}
+	});
 
 	let selected: string = 'lama';
 
@@ -78,7 +85,7 @@
 	<title>IO Paint</title>
 </svelte:head>
 
-<div class="h-screen bg-black flex items-center">
+<div class=" flex items-center justify-center gradient-background min-h-screen">
 	<div class="flex flex-col justify-items-center gap-y-6 w-full">
 		<form on:submit={handleSubmit} class="container mx-auto text-center flex flex-col gap-y-6 mb-6">
 			<h1 class="text-white font-bold text-lg">IO Paint Wrapper</h1>
@@ -107,7 +114,8 @@
 		</form>
 		{#if responseData.length > 0}
 			<div
-				class="text-gray599 text-sm rounded-xl border-2 border-gray-600 w-1/2 mx-auto whitespace-pre-wrap p-4 text-white"
+				bind:this={outputFrame}
+				class="terminal-gradient-background max-h-64 overflow-y-auto text-sm rounded-xl border-2 border-gray-600 w-2/3 mx-auto whitespace-pre-wrap p-4 text-white"
 			>
 				{#each responseData as response}
 					<p>{response.output || response.error || response.message}</p>
@@ -115,3 +123,12 @@
 			</div>{/if}
 	</div>
 </div>
+
+<style>
+	.gradient-background {
+		background: linear-gradient(135deg, #6b21a8, #f97316);
+	}
+	.terminal-gradient-background {
+		background: linear-gradient(135deg, #111827, #233876);
+	}
+</style>
