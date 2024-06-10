@@ -10,8 +10,9 @@ services:
       dockerfile: Dockerfile
       context: .
     ports:
-      - "3000:3000"
+      - "3100:3000"
       - "8080:8080"
+      - "9880:9880"
         #extra_hosts:
         #  - "host.docker.internal:host-gateway"
 volumes:

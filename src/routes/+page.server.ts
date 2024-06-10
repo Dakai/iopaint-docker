@@ -12,7 +12,7 @@ let wss: WebSocketServer | undefined;
 
 const initWebSocketServer = () => {
   if (!wss) {
-    wss = new WebSocketServer({ port: 9880 });
+    wss = new WebSocketServer({ host: '0.0.0.0', port: 9880 });
     console.log("WebSocketServer started on port 9880");
     wss.on("connection", (ws) => {
 

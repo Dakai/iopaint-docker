@@ -43,6 +43,8 @@ RUN bun run build
 RUN chmod +x run.sh
 
 EXPOSE 3000
+# WebSocket Port
+EXPOSE 9880
 #CMD ["bun", "./build/index.js"]
 CMD ["./run.sh"]
 #CMD ["iopaint", "start","--model=lama", "--device=cpu", "--host=0.0.0.0", "--enable-realesrgan", "--realesrgan-model", "RealESRGAN_x4plus", "--realesrgan-device", "cpu", "--enable-gfpgan", "--gfpgan-device", "cpu","--enable-remove-bg", "--enable-interactive-seg", "--interactive-seg-model=vit_l", "--interactive-seg-device=cpu"]
