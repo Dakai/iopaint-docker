@@ -3,11 +3,35 @@
 	import { writable } from 'svelte/store';
 	import { enhance } from '$app/forms';
 	import { output, process_id } from '$lib/stores';
+	import { onMount } from 'svelte';
 
 	export let data: any;
 	const { models } = data;
+	let ws: WebSocket;
+	let responseData: Array<{ output?: string; error?: string; message?: string }> = [];
 
-	let selected: string;
+	onMount(() => {
+		ws = new WebSocket('ws://localhost:9880');
+
+		ws.onmessage = (event: MessageEvent) => {
+			const data = JSON.parse(event.data);
+			responseData = [...responseData, data];
+			console.log('data', data);
+		};
+
+		ws.onclose = () => {
+			console.log('Connection closed');
+		};
+
+		return () => {
+			if (ws) {
+				ws.close();
+			}
+		};
+	});
+	//	let ws = new WebSocket('ws://localhost:9880');
+
+	let selected: string = 'lama';
 
 	const displayName = writable('');
 
@@ -17,21 +41,29 @@
 
 	const handleSubmit = async (event: SubmitEvent) => {
 		event.preventDefault();
-		const formData = new FormData(event.target as HTMLFormElement);
+		const formData = new FormData();
+		formData.append('model', selected);
 
 		try {
-			const response = await fetch('/?/run', {
+			//const response = await fetch('?/run', {
+			const response = await fetch('?/test', {
 				method: 'POST',
 				body: formData
 			});
 
-			const data = await response.json();
-			if (response.ok) {
-				$output = data.output;
-				$process_id = data.id;
-			} else {
-				$output = data.error;
+			if (!response.ok) {
+				throw new Error(response.statusText);
 			}
+
+			const data = await response.json();
+			console.log('data', data);
+			//if (response.ok) {
+			//	$output = data.output;
+			//	console.log('output', $output);
+			//	$process_id = data.id;
+			//} else {
+			//	$output = data.error;
+			//}
 
 			//const { id } = await response.json();
 			//$process_id = id;
@@ -73,10 +105,13 @@
 				disabled={$process_id === 0}>End Process {$process_id}</GradientButton
 			>
 		</form>
-		<div
-			class="text-gray599 text-sm rounded-xl border-2 border-gray-600 w-1/2 mx-auto whitespace-pre-wrap"
-		>
-			{$output}
-		</div>
+		{#if responseData.length > 0}
+			<div
+				class="text-gray599 text-sm rounded-xl border-2 border-gray-600 w-1/2 mx-auto whitespace-pre-wrap p-4 text-white"
+			>
+				{#each responseData as response}
+					<p>{response.output || response.error || response.message}</p>
+				{/each}
+			</div>{/if}
 	</div>
 </div>
