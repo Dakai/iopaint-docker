@@ -89,7 +89,7 @@
 	<div class="flex flex-col justify-items-center gap-y-6 w-full">
 		<form on:submit={handleSubmit} class="container mx-auto text-center flex flex-col gap-y-6 mb-6">
 			<h1 class="text-white font-bold text-lg">IO Paint Wrapper</h1>
-			<Select class="w-1/4 mx-auto" items={models} bind:value={selected} defaultValue="lama" />
+			<Select class="w-1/4 mx-auto" items={models} bind:value={selected} defaultValue="Lama" />
 			<GradientButton
 				class="w-1/4 mx-auto"
 				type="submit"
