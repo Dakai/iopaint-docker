@@ -8,7 +8,29 @@ let args = " --device=cpu --host=0.0.0.0 --enable-realesrgan \
 --enable-gfpgan --gfpgan-device cpu \
 --enable-remove-bg --enable-interactive-seg --interactive-seg-model=vit_l --interactive-seg-device=cpu"
 
-const wss = new WebSocketServer({ port: 9880 });
+let wss: WebSocketServer | undefined;
+
+const initWebSocketServer = () => {
+  if (!wss) {
+    wss = new WebSocketServer({ port: 9880 });
+    console.log("WebSocketServer started on port 9880");
+    wss.on("connection", (ws) => {
+
+      ws.on("message", (message) => {
+        console.log("received: %s", message);
+      });
+    })
+    wss.on('error', (error) => {
+      console.log('error', error)
+    })
+    wss.on("close", () => {
+      console.log("WebSocketServer closed");
+      wss = undefined
+    })
+  }
+}
+
+initWebSocketServer();
 
 export const actions = {
   run: async (req: RequestEvent) => {
@@ -66,7 +88,7 @@ export const actions = {
     //console.log(run)
     const process = exec(run, (error, stdout, stderr) => {
       if (error) {
-        wss.clients.forEach((client) => {
+        wss?.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
             client.send(JSON.stringify({ error: error.message }));
           }
@@ -75,7 +97,7 @@ export const actions = {
         return;
       }
       if (stderr) {
-        wss.clients.forEach((client) => {
+        wss?.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
             client.send(JSON.stringify({ error: stderr }));
           }
@@ -83,7 +105,7 @@ export const actions = {
         //console.log(`stderr: ${stderr}`);
         return;
       }
-      wss.clients.forEach((client) => {
+      wss?.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify({ output: stdout }));
         }
