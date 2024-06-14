@@ -1,6 +1,7 @@
 import type { RequestEvent } from "@sveltejs/kit";
 import { exec } from 'child_process'
 import { WebSocket, WebSocketServer } from "ws";
+import Docker from 'dockerode'
 
 let cmd = "iopaint start --model "
 let args = " --device=cpu --host=0.0.0.0 --enable-realesrgan \
@@ -10,11 +11,28 @@ let args = " --device=cpu --host=0.0.0.0 --enable-realesrgan \
 
 let wss: WebSocketServer | undefined;
 
+const docker = new Docker();
+
 const initWebSocketServer = () => {
   if (!wss) {
     wss = new WebSocketServer({ host: '0.0.0.0', port: 9880 });
     console.log("WebSocketServer started on port 9880");
     wss.on("connection", (ws) => {
+
+      const containerName = 'iopaint-wrapper'
+      const container = docker.getContainer(containerName);
+      container.logs({ follow: true, stdout: true, stderr: true }, (err, stream) => {
+        if (err) {
+          console.log(err)
+          ws.send(JSON.stringify({ error: err }))
+          return;
+        }
+
+        stream?.on('data', (data: Buffer) => {
+          ws.send(data.toString())
+        })
+
+      })
 
       ws.on("message", (message) => {
         console.log("received: %s", message);
