@@ -9,7 +9,7 @@ WORKDIR /app
 #ENV VIRTUAL_ENV=/app/venv
 
 #RUN apt-get update && apt-get install python3 ffmpeg libsm6 libxext6 curl git unzip python3-venv -y
-RUN apt-get update && apt-get install python3 python3-venv -y
+RUN apt-get update && apt-get install python3 python3-venv gcc cmake -y
 
 # Create the virtual environment
 #RUN python3 -m venv $VIRTUAL_ENV
