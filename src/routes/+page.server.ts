@@ -51,36 +51,35 @@ const initWebSocketServer = () => {
 initWebSocketServer();
 
 export const actions = {
-  run: async (req: RequestEvent) => {
-    const data = await req.request.formData();
-    const model = data.get('model')
-    console.log(data)
-    let run = ''
-    if (model) {
-      run = cmd + model + args;
-    }
-    else
-      return { error: 'No model selected' }
+  //run: async (req: RequestEvent) => {
+  //  const data = await req.request.formData();
+  //  const model = data.get('model')
+  //  console.log(data)
+  //  let run = ''
+  //  if (model) {
+  //    run = cmd + model + args;
+  //  }
+  //  else
+  //    return { error: 'No model selected' }
 
-    return new Promise((resolve, reject) => {
-      const process = exec(run, (error, stdout, stderr) => {
-        if (error) {
-          console.log(`error: ${error.message}`);
-          reject({ error: error.message })
-          return;
-        }
-        if (stderr) {
-          console.log(`stderr: ${stderr}`);
+  //  return new Promise((resolve, reject) => {
+  //    const process = exec(run, (error, stdout, stderr) => {
+  //      if (error) {
+  //        console.log(`error: ${error.message}`);
+  //        reject({ error: error.message })
+  //        return;
+  //      }
+  //      if (stderr) {
+  //        console.log(`stderr: ${stderr}`);
 
-          reject({ error: stderr })
-          return;
-        }
-        console.log(`stdout: ${stdout}`);
-      })
-      console.log('process', process.pid)
-    })
-
-  },
+  //        reject({ error: stderr })
+  //        return;
+  //      }
+  //      console.log(`stdout: ${stdout}`);
+  //    })
+  //    console.log('process', process.pid)
+  //  })
+  //},
   stop: async () => {
     let pid = 0;
     exec('kill ' + pid, (error, stdout, stderr) => {
@@ -95,14 +94,23 @@ export const actions = {
       console.log(`stdout: ${stdout}`);
     })
   },
-  test: async (req: RequestEvent) => {
+  run: async (req: RequestEvent) => {
     const data = await req.request.formData();
     const model = data.get('model')
     //console.log(data)
     let run = 'ls'
-    //if (model) {
-    //  run = cmd + model + args;
-    //}
+    if (model) {
+      run = cmd + model + args;
+    }
+    else {
+      console.log('No model selected')
+      wss?.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({ error: 'No model selected' }));
+        }
+      })
+      return
+    }
     //console.log(run)
     const process = exec(run, (error, stdout, stderr) => {
       if (error) {
