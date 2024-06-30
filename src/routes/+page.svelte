@@ -14,6 +14,14 @@
 	onMount(() => {
 		ws = new WebSocket('ws://localhost:9880');
 
+		ws.onopen = () => {
+			console.log('WebSocket connection established');
+		};
+
+		ws.onerror = (error) => {
+			console.log('error', error);
+		};
+
 		ws.onmessage = (event: MessageEvent) => {
 			const data = JSON.parse(event.data);
 			responseData = [...responseData, data];
@@ -52,8 +60,8 @@
 		formData.append('model', selected);
 
 		try {
-			//const response = await fetch('?/run', {
-			const response = await fetch('?/test', {
+			const response = await fetch('?/run', {
+				//const response = await fetch('?/test', {
 				method: 'POST',
 				body: formData
 			});

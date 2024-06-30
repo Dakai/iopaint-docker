@@ -1,9 +1,9 @@
 services:
   iopaint-wrapper:
     container_name: iopaint-wrapper
-    volumes:
-      - ./.cache:/app/.cache
-      - ./venv:/app/venv
+    #volumes:
+    #  - ./.cache:/root/.cache
+    #  - ./venv:/app/venv
     environment:
       - VIRTUAL_ENV=/app/venv
     build: 

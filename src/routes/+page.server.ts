@@ -3,7 +3,8 @@ import { exec } from 'child_process'
 import { WebSocket, WebSocketServer } from "ws";
 //import Docker from 'dockerode'
 
-let cmd = "iopaint start --model "
+//let cmd = "iopaint start --model "
+let cmd = "python test.py start --model "
 let args = " --device=cpu --host=0.0.0.0 --enable-realesrgan \
 --realesrgan-model RealESRGAN_x4plus --realesrgan-device cpu \
 --enable-gfpgan --gfpgan-device cpu \
@@ -18,22 +19,7 @@ const initWebSocketServer = () => {
     wss = new WebSocketServer({ host: '0.0.0.0', port: 9880 });
     console.log("WebSocketServer started on port 9880");
     wss.on("connection", (ws) => {
-
-      //const containerName = 'iopaint-wrapper'
-      //const container = docker.getContainer(containerName);
-      //container.logs({ follow: true, stdout: true, stderr: true }, (err, stream) => {
-      //  if (err) {
-      //    console.log(err)
-      //    ws.send(JSON.stringify({ error: err }))
-      //    return;
-      //  }
-
-      //  stream?.on('data', (data: Buffer) => {
-      //    ws.send(data.toString())
-      //  })
-
-      //})
-
+      console.log('New WebSocket Connection')
       ws.on("message", (message) => {
         console.log("received: %s", message);
       });
@@ -51,35 +37,6 @@ const initWebSocketServer = () => {
 initWebSocketServer();
 
 export const actions = {
-  //run: async (req: RequestEvent) => {
-  //  const data = await req.request.formData();
-  //  const model = data.get('model')
-  //  console.log(data)
-  //  let run = ''
-  //  if (model) {
-  //    run = cmd + model + args;
-  //  }
-  //  else
-  //    return { error: 'No model selected' }
-
-  //  return new Promise((resolve, reject) => {
-  //    const process = exec(run, (error, stdout, stderr) => {
-  //      if (error) {
-  //        console.log(`error: ${error.message}`);
-  //        reject({ error: error.message })
-  //        return;
-  //      }
-  //      if (stderr) {
-  //        console.log(`stderr: ${stderr}`);
-
-  //        reject({ error: stderr })
-  //        return;
-  //      }
-  //      console.log(`stdout: ${stdout}`);
-  //    })
-  //    console.log('process', process.pid)
-  //  })
-  //},
   stop: async () => {
     let pid = 0;
     exec('kill ' + pid, (error, stdout, stderr) => {
@@ -97,8 +54,8 @@ export const actions = {
   run: async (req: RequestEvent) => {
     const data = await req.request.formData();
     const model = data.get('model')
-    //console.log(data)
-    let run = 'ls'
+    console.log(model)
+    let run = ''
     if (model) {
       run = cmd + model + args;
     }
@@ -112,32 +69,51 @@ export const actions = {
       return
     }
     //console.log(run)
-    const process = exec(run, (error, stdout, stderr) => {
-      if (error) {
+    const process = exec(run)
+    if (process.stdout != null) {
+      process.stdout.on('data', (data: any) => {
         wss?.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify({ error: error.message }));
+            client.send(JSON.stringify({ ouptput: data.toString() }));
           }
-        })
-        console.log(`error: ${error.message}`);
-        return;
-      }
-      if (stderr) {
+        });
+      });
+    } else if (process.stderr != null) {
+      process.stderr.on('data', (data: any) => {
         wss?.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify({ error: stderr }));
+            client.send(JSON.stringify({ error: data.toString() }));
           }
-        })
-        //console.log(`stderr: ${stderr}`);
-        return;
-      }
-      wss?.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify({ output: stdout }));
-        }
-      })
-      console.log(`stdout: ${stdout}`);
-    })
+        });
+      });
+
+    }
+    //const process = exec(run, (error, stdout, stderr) => {
+    //  if (error) {
+    //    wss?.clients.forEach((client) => {
+    //      if (client.readyState === WebSocket.OPEN) {
+    //        client.send(JSON.stringify({ error: error.message }));
+    //      }
+    //    })
+    //    console.log(`error: ${error.message}`);
+    //    return;
+    //  }
+    //  if (stderr) {
+    //    wss?.clients.forEach((client) => {
+    //      if (client.readyState === WebSocket.OPEN) {
+    //        client.send(JSON.stringify({ error: stderr }));
+    //      }
+    //    })
+    //    console.log(`stderr: ${stderr}`);
+    //    return;
+    //  }
+    //  wss?.clients.forEach((client) => {
+    //    if (client.readyState === WebSocket.OPEN) {
+    //      client.send(JSON.stringify({ output: data.tostring()stdout }));
+    //    }
+    //  })
+    //  console.log(`stdout: ${stdout}`);
+    //})
     console.log('process', process.pid)
     //return wss.close()
   }

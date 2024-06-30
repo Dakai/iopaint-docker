@@ -1,7 +1,7 @@
 # Use the official Python image, which always includes the latest Python version
 #FROM python:alpine
-#FROM python:3.10.11-slim-buster
-FROM oven/bun:debian
+FROM python:3.10.11
+#FROM oven/bun:debian
 # Set the working directory inside the container
 WORKDIR /app
 
@@ -9,7 +9,7 @@ WORKDIR /app
 #ENV VIRTUAL_ENV=/app/venv
 
 #RUN apt-get update && apt-get install python3 ffmpeg libsm6 libxext6 curl git unzip python3-venv -y
-RUN apt-get update && apt-get install python3 python3-venv pip -y
+#RUN apt-get update && apt-get install python3 python3-venv pip -y libgl1
 
 # Create the virtual environment
 #RUN python3 -m venv $VIRTUAL_ENV
@@ -38,9 +38,12 @@ RUN apt-get update && apt-get install python3 python3-venv pip -y
 #    pip3 install -r requirements.txt
 
 COPY . .
-RUN bun install
-RUN bun run build
-RUN chmod +x run.sh
+
+RUN apt-get update && \
+    apt-get install curl unzip -y && \
+    curl -fsSL https://bun.sh/install | bash && \
+    . /root/.bashrc && \
+    /root/.bun/bin/bun install && /root/.bun/bin/bun run build && chmod +x run.sh
 
 EXPOSE 3000
 # WebSocket Port
