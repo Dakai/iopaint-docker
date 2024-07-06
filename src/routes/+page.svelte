@@ -11,6 +11,9 @@
 	let responseData: Array<{ output?: string; error?: string; message?: string }> = [];
 	let outputFrame: HTMLDivElement;
 
+	let isRunning = false;
+	let currentProcessId = 0;
+
 	onMount(() => {
 		ws = new WebSocket('ws://localhost:9880');
 
@@ -24,6 +27,10 @@
 
 		ws.onmessage = (event: MessageEvent) => {
 			const data = JSON.parse(event.data);
+			if (data.type === 'processEnded') {
+				isRunning = false;
+				currentProcessId = 0;
+			}
 			responseData = [...responseData, data];
 			console.log('data', data);
 		};
@@ -60,8 +67,8 @@
 		formData.append('model', selected);
 
 		try {
+			isRunning = true;
 			const response = await fetch('?/run', {
-				//const response = await fetch('?/test', {
 				method: 'POST',
 				body: formData
 			});
@@ -71,19 +78,28 @@
 			}
 
 			const data = await response.json();
+			currentProcessId = data.processId;
 			console.log('data', data);
-			//if (response.ok) {
-			//	$output = data.output;
-			//	console.log('output', $output);
-			//	$process_id = data.id;
-			//} else {
-			//	$output = data.error;
-			//}
-
-			//const { id } = await response.json();
-			//$process_id = id;
 		} catch (error) {
-			//$output = error;
+			console.error(error);
+		}
+	};
+
+	const handleStop = async () => {
+		const formData = new FormData();
+		formData.append('processId', currentProcessId.toString());
+
+		try {
+			const response = await fetch('?/stop', {
+				method: 'POST',
+				body: formData
+			});
+			if (!response.ok) {
+				throw new Error(response.statusText);
+			}
+			isRunning = false;
+			currentProcessId = 0;
+		} catch (error) {
 			console.error(error);
 		}
 	};
@@ -97,13 +113,19 @@
 	<div class="flex flex-col justify-items-center gap-y-6 w-full">
 		<form on:submit={handleSubmit} class="container mx-auto text-center flex flex-col gap-y-6 mb-6">
 			<h1 class="text-white font-bold text-lg">IO Paint Wrapper</h1>
-			<Select class="w-1/4 mx-auto" items={models} bind:value={selected} defaultValue="Lama" />
+			<Select
+				class="w-1/4 mx-auto"
+				items={models}
+				bind:value={selected}
+				defaultValue="Lama"
+				disabled={!selected || isRunning}
+			/>
 			<GradientButton
 				class="w-1/4 mx-auto"
 				type="submit"
 				disabled={!selected}
 				name="model"
-				value={selected}>Run with {$displayName}</GradientButton
+				value={selected}>{isRunning ? 'Running...' : `Run with ${$displayName}`}</GradientButton
 			>
 			<GradientButton
 				class="w-1/4 mx-auto"
@@ -112,13 +134,10 @@
 				disabled={$process_id === 0}>Enter IO Paint</GradientButton
 			>
 		</form>
-		<form use:enhance method="POST" action="?/stop" class="container mx-auto text-center">
-			<GradientButton
-				class="w-1/4 mx-auto"
-				color="pinkToOrange"
-				type="submit"
-				disabled={$process_id === 0}>End Process {$process_id}</GradientButton
-			>
+		<form on:submit|preventDefault={handleStop} class="container mx-auto text-center">
+			<GradientButton class="w-1/4 mx-auto" color="pinkToOrange" type="submit" disabled={!isRunning}
+				>Stop Process
+			</GradientButton>
 		</form>
 		{#if responseData.length > 0}
 			<div

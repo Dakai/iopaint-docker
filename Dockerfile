@@ -40,7 +40,7 @@ WORKDIR /app
 COPY . .
 
 RUN apt-get update && \
-    apt-get install curl unzip -y && \
+    apt-get install curl unzip htop -y && \
     curl -fsSL https://bun.sh/install | bash && \
     . /root/.bashrc && \
     /root/.bun/bin/bun install && /root/.bun/bin/bun run build && chmod +x run.sh
