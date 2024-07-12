@@ -3,8 +3,8 @@ import { exec, spawn } from 'child_process';
 import { WebSocket, WebSocketServer } from 'ws';
 //import Docker from 'dockerode'
 
-//let cmd = "iopaint start --model "
-let cmd = 'python -u test.py start --model ';
+let cmd = "iopaint start --model "
+//let cmd = 'python -u test.py start --model ';
 let args =
   ' --device=cpu --host=0.0.0.0 --enable-realesrgan \
 --realesrgan-model RealESRGAN_x4plus --realesrgan-device cpu \
@@ -14,6 +14,8 @@ let args =
 let wss: WebSocketServer | undefined;
 
 let currentProcess: ReturnType<typeof spawn> | null = null;
+
+let processData = { id: 0 };
 
 const initWebSocketServer = () => {
   if (!wss) {
@@ -39,22 +41,15 @@ initWebSocketServer();
 
 export const actions = {
   stop: async (req: RequestEvent) => {
-    const data = await req.request.formData();
-    const processId = data.get('processId');
-    console.log(processId)
-
-    //const { processId } = await req.request.json();
-    //if (currentProcess && currentProcess.pid === processId) {
-    //  currentProcess.kill();
-    //  currentProcess = null;
-    //  wss?.clients.forEach((client) => {
-    //    if (client.readyState === WebSocket.OPEN) {
-    //      client.send(JSON.stringify({ type: 'processEnded' }));
-    //    }
-    //  });
-    //  return { success: true };
-    //}
-    //return { success: false, error: 'Process not found' };
+    console.log('actions stop', processData);
+    if (processData.id) {
+      console.log('stop', processData.id);
+      exec('kill ' + processData.id);
+      processData.id = 0; // Reset processId after killing
+      return { success: true };
+    } else {
+      return { success: false, error: 'No active process to stop' };
+    }
   },
 
   run: async (req: RequestEvent) => {
@@ -92,9 +87,12 @@ export const actions = {
         }
       });
       currentProcess = null;
+      processData.id = 0;
     });
+    currentProcess.pid ? processData.id = currentProcess.pid : null;
+    console.log('run', processData.id);
 
-    return { success: true, processId: currentProcess.pid };
+    return { success: true, id: currentProcess.pid };
     //const process = exec(run, (error, stdout, stderr) => {
     //  if (error) {
     //    wss?.clients.forEach((client) => {

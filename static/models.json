@@ -1,6 +1,30 @@
 [
-	{
-		"value": "lama",
-		"name": "LaMa"
-	}
+  {
+    "value": "lama",
+    "name": "LaMa (Eraser)"
+  },
+  {
+    "value": "mat",
+    "name": "MAT (Eraser)"
+  },
+  {
+    "value": "migan",
+    "name": "Migan (Eraser)"
+  },
+  {
+    "value": "Sanster/PowerPaint-V1-stable-diffusion-inpainting",
+    "name": "PowerPaint (Image Inpainting)"
+  },
+  {
+    "value": "Sanster/AnyText",
+    "name": "AnyText"
+  },
+  {
+    "value": "timbrooks/instruct-pix2pix",
+    "name": "pix2pix Follow Image Editing Instructions"
+  },
+  {
+    "value": "Fantasy-Studio/Paint-by-Example",
+    "name": "Paint by Example"
+  }
 ]

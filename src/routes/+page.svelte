@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { Select, GradientButton } from 'flowbite-svelte';
 	import { writable } from 'svelte/store';
-	import { enhance } from '$app/forms';
-	import { output, process_id } from '$lib/stores';
+	//import { enhance } from '$app/forms';
+	//import { output, process_id } from '$lib/stores';
 	import { onMount, afterUpdate } from 'svelte';
 
 	export let data: any;
@@ -87,7 +87,7 @@
 
 	const handleStop = async () => {
 		const formData = new FormData();
-		formData.append('processId', currentProcessId.toString());
+		//formData.append('processId', currentProcessId.toString());
 
 		try {
 			const response = await fetch('?/stop', {
@@ -123,18 +123,15 @@
 			<GradientButton
 				class="w-1/4 mx-auto"
 				type="submit"
-				disabled={!selected}
+				disabled={!selected || isRunning}
 				name="model"
 				value={selected}>{isRunning ? 'Running...' : `Run with ${$displayName}`}</GradientButton
 			>
-			<GradientButton
-				class="w-1/4 mx-auto"
-				color="tealToLime"
-				href="/iopaint"
-				disabled={$process_id === 0}>Enter IO Paint</GradientButton
+			<GradientButton class="w-1/4 mx-auto" color="tealToLime" href="/iopaint" disabled={!isRunning}
+				>Enter IO Paint</GradientButton
 			>
 		</form>
-		<form on:submit|preventDefault={handleStop} class="container mx-auto text-center">
+		<form on:submit={handleStop} class="container mx-auto text-center">
 			<GradientButton class="w-1/4 mx-auto" color="pinkToOrange" type="submit" disabled={!isRunning}
 				>Stop Process
 			</GradientButton>
