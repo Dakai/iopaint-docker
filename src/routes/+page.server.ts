@@ -65,7 +65,8 @@ export const actions = {
       currentProcess.stdout.on('data', (data: any) => {
         wss?.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify({ ouptput: data.toString() }));
+            console.log('send', data.toString());
+            client.send(JSON.stringify({ output: data.toString() }));
           }
         });
       });

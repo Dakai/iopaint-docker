@@ -2,17 +2,20 @@
 	import { Select, GradientButton } from 'flowbite-svelte';
 	import { writable } from 'svelte/store';
 	//import { enhance } from '$app/forms';
-	//import { output, process_id } from '$lib/stores';
+	import { isRunning } from '$lib/stores';
 	import { onMount, afterUpdate } from 'svelte';
 
 	export let data: any;
 	const { models } = data;
 	let ws: WebSocket;
-	let responseData: Array<{ output?: string; error?: string; message?: string }> = [];
+	let responseData: Array<{ output?: string; error?: string; message?: string; type?: string }> =
+		[];
 	let outputFrame: HTMLDivElement;
 
-	let isRunning = false;
+	//let isRunning = false;
 	let currentProcessId = 0;
+
+	$: console.log($isRunning);
 
 	onMount(() => {
 		ws = new WebSocket('ws://localhost:9880');
@@ -28,11 +31,11 @@
 		ws.onmessage = (event: MessageEvent) => {
 			const data = JSON.parse(event.data);
 			if (data.type === 'processEnded') {
-				isRunning = false;
+				$isRunning = false;
 				currentProcessId = 0;
 			}
 			responseData = [...responseData, data];
-			console.log('data', data);
+			console.log('data', responseData);
 		};
 
 		ws.onclose = () => {
@@ -67,7 +70,7 @@
 		formData.append('model', selected);
 
 		try {
-			isRunning = true;
+			$isRunning = true;
 			const response = await fetch('?/run', {
 				method: 'POST',
 				body: formData
@@ -97,7 +100,7 @@
 			if (!response.ok) {
 				throw new Error(response.statusText);
 			}
-			isRunning = false;
+			$isRunning = false;
 			currentProcessId = 0;
 		} catch (error) {
 			console.error(error);
@@ -118,21 +121,28 @@
 				items={models}
 				bind:value={selected}
 				defaultValue="Lama"
-				disabled={!selected || isRunning}
+				disabled={!selected || $isRunning}
 			/>
 			<GradientButton
 				class="w-1/4 mx-auto"
 				type="submit"
-				disabled={!selected || isRunning}
+				disabled={!selected || $isRunning}
 				name="model"
-				value={selected}>{isRunning ? 'Running...' : `Run with ${$displayName}`}</GradientButton
+				value={selected}>{$isRunning ? 'Running...' : `Run with ${$displayName}`}</GradientButton
 			>
-			<GradientButton class="w-1/4 mx-auto" color="tealToLime" href="/iopaint" disabled={!isRunning}
-				>Enter IO Paint</GradientButton
+			<GradientButton
+				class="w-1/4 mx-auto"
+				color="tealToLime"
+				href="/iopaint"
+				disabled={!$isRunning}>Enter IO Paint</GradientButton
 			>
 		</form>
 		<form on:submit={handleStop} class="container mx-auto text-center">
-			<GradientButton class="w-1/4 mx-auto" color="pinkToOrange" type="submit" disabled={!isRunning}
+			<GradientButton
+				class="w-1/4 mx-auto"
+				color="pinkToOrange"
+				type="submit"
+				disabled={!$isRunning}
 				>Stop Process
 			</GradientButton>
 		</form>
@@ -142,7 +152,7 @@
 				class="terminal-gradient-background max-h-64 overflow-y-auto text-sm rounded-xl border-2 border-gray-600 w-2/3 mx-auto whitespace-pre-wrap p-4 text-white"
 			>
 				{#each responseData as response}
-					<p>{response.output || response.error || response.message}</p>
+					<p>{response.output || response.error || response.message || response.type}</p>
 				{/each}
 			</div>{/if}
 	</div>
