@@ -43,8 +43,8 @@ export const actions = {
   stop: async (req: RequestEvent) => {
     console.log('actions stop', processData);
     if (processData.id) {
-      console.log('stop', processData.id);
-      exec('kill ' + processData.id);
+      //console.log('stop', processData.id);
+      exec('killall iopaint');
       processData.id = 0; // Reset processId after killing
       return { success: true };
     } else {
@@ -94,32 +94,5 @@ export const actions = {
     console.log('run', processData.id);
 
     return { success: true, id: currentProcess.pid };
-    //const process = exec(run, (error, stdout, stderr) => {
-    //  if (error) {
-    //    wss?.clients.forEach((client) => {
-    //      if (client.readyState === WebSocket.OPEN) {
-    //        client.send(JSON.stringify({ error: error.message }));
-    //      }
-    //    })
-    //    console.log(`error: ${error.message}`);
-    //    return;
-    //  }
-    //  if (stderr) {
-    //    wss?.clients.forEach((client) => {
-    //      if (client.readyState === WebSocket.OPEN) {
-    //        client.send(JSON.stringify({ error: stderr }));
-    //      }
-    //    })
-    //    console.log(`stderr: ${stderr}`);
-    //    return;
-    //  }
-    //  wss?.clients.forEach((client) => {
-    //    if (client.readyState === WebSocket.OPEN) {
-    //      client.send(JSON.stringify({ output: data.tostring()stdout }));
-    //    }
-    //  })
-    //  console.log(`stdout: ${stdout}`);
-    //})
-    //return wss.close()
   }
 };

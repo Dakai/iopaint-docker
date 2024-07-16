@@ -15,7 +15,7 @@
 	//let isRunning = false;
 	let currentProcessId = 0;
 
-	$: console.log($isRunning);
+	//$: console.log($isRunning);
 
 	onMount(() => {
 		ws = new WebSocket('ws://localhost:9880');
@@ -98,6 +98,7 @@
 				body: formData
 			});
 			if (!response.ok) {
+				console.log('error', response.statusText);
 				throw new Error(response.statusText);
 			}
 			$isRunning = false;
@@ -138,11 +139,7 @@
 			>
 		</form>
 		<form on:submit={handleStop} class="container mx-auto text-center">
-			<GradientButton
-				class="w-1/4 mx-auto"
-				color="pinkToOrange"
-				type="submit"
-				disabled={!$isRunning}
+			<GradientButton class="w-1/4 mx-auto" color="pinkToOrange" type="submit"
 				>Stop Process
 			</GradientButton>
 		</form>
