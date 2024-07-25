@@ -3,8 +3,8 @@ import { exec, spawn } from 'child_process';
 import { WebSocket, WebSocketServer } from 'ws';
 //import Docker from 'dockerode'
 
-//let cmd = "iopaint start --model "
-let cmd = 'python -u test.py start --model ';
+let cmd = "iopaint start --model "
+//let cmd = 'python -u test.py start --model ';
 let args =
   ' --device=cpu --host=0.0.0.0 --enable-realesrgan \
 --realesrgan-model RealESRGAN_x4plus --realesrgan-device cpu \
