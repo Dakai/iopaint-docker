@@ -40,7 +40,7 @@ WORKDIR /app
 COPY . .
 
 RUN apt-get update && \
-    apt-get install ffmpeg libsm6 libxext6 curl git curl unzip htop psmisc -y && \
+    apt-get install ffmpeg libsm6 libxext6 curl git curl unzip htop psmisc procps-ng -y && \
     curl -fsSL https://bun.sh/install | bash && \
     . /root/.bashrc && \
     /root/.bun/bin/bun install && /root/.bun/bin/bun run build && chmod +x run.sh
